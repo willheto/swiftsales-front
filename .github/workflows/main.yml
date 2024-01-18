@@ -1,0 +1,46 @@
+name: Node.js CI and Deploy
+
+on:
+    push:
+        branches: ['dev', 'master']
+    pull_request:
+        branches: ['dev', 'master']
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [18.x] # Adjust as needed
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: 'npm'
+
+            - run: npm install
+
+            - name: build-dev
+              if: github.ref == 'refs/heads/dev'
+              run: npm run build-development
+
+            - name: Install sshpass
+              run: sudo apt-get update && sudo apt-get install -y sshpass
+
+            - name: Remove old build artifacts
+              if: github.ref == 'refs/heads/dev'
+              run: |
+                  sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'cd /var/www && rm -r dev-swiftsales-front && mkdir dev-swiftsales-front'
+
+            # Transfer build artifacts to the VM using sshpass
+            - name: Transfer Build Artifacts
+              if: github.ref == 'refs/heads/dev'
+              run: |
+                  sshpass -p 'TA4bgvMmMokqrKLOM1je' scp -o StrictHostKeyChecking=no -r dist/* root@146.190.56.16:/var/www/dev-swiftsales-front
+
+            
