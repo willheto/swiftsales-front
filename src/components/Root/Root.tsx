@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import PreviewBlock from '../PreviewBlock/PreviewBlock';
 
 const Root = () => {
+	const [error, setError] = React.useState<Error | null>(null);
 	const [salesAppointment, setSalesAppointment] = React.useState<SalesAppointmentInterface>();
 	const salesAppointmentFiles = salesAppointment?.salesAppointmentFiles || [];
 
@@ -19,9 +20,14 @@ const Root = () => {
 			if (!salesAppointmentID) throw new Error('No salesAppointmentID provided');
 			const response = await api.salesAppointments.getSalesAppointment(salesAppointmentID);
 
-			//@ts-ignore
+			// @ts-expect-error
+			if (response.salesAppointment === null) {
+				throw new Error(`No salesAppointment with ID ${salesAppointmentID} found`);
+			}
+			// @ts-ignore
 			setSalesAppointment(response.salesAppointment);
 		} catch (error) {
+			setError(error);
 			console.error(error);
 		}
 	}, []);
@@ -35,12 +41,23 @@ const Root = () => {
 		filePath: string;
 	} | null>(null);
 
+	const salesAppointmentHasFiles = salesAppointmentFiles.length > 0;
+
 	if (!salesAppointment) {
 		return (
 			<div className="w-100 h-100 align-items-center justify-content-center d-flex flex-column">
 				<Container className="justify-content-center align-items-center d-flex flex-column p-5">
-					<ScaleLoader color="rgb(16, 37, 38)" className="mb-4" />
-					Getting your meeting ready...
+					{error ? (
+						<>
+							<h2 className="mb-4">Something went wrong</h2>
+							<p className="mb-4 text-danger">{error.message}</p>
+						</>
+					) : (
+						<>
+							<ScaleLoader color="rgb(16, 37, 38)" className="mb-4" />
+							Getting your meeting ready...
+						</>
+					)}
 				</Container>
 			</div>
 		);
@@ -57,11 +74,13 @@ const Root = () => {
 				}}
 			>
 				<MeetingBlock salesAppointment={salesAppointment} />
-				<FileBlock
-					setPreviewFile={setPreviewFile}
-					previewFile={previewFile}
-					salesAppointmentFiles={salesAppointmentFiles}
-				/>
+				{salesAppointmentHasFiles && (
+					<FileBlock
+						setPreviewFile={setPreviewFile}
+						previewFile={previewFile}
+						salesAppointmentFiles={salesAppointmentFiles}
+					/>
+				)}
 			</div>
 			<div
 				style={{
