@@ -9,7 +9,9 @@ const MeetingBlock = ({ salesAppointment }: { salesAppointment: SalesAppointment
 		<Container className="w-100">
 			{salesAppointmentHasMeetingUrl ? (
 				<Meeting>
-					<StyledIframe width="100%" height="500px" src={salesAppointment?.meetingUrl} />
+					<StyledIframe 
+					allow='camera; microphone; fullscreen; display-capture; autoplay; geolocation; midi; encrypted-media; vr; accelerometer; gyroscope; payment; ambient-light-sensor; magnetometer; usb; xr-spatial-tracking;'
+					width="100%" height="500px" src={salesAppointment?.meetingUrl} />
 				</Meeting>
 			) : (
 				<div className="d-flex justify-content-center align-items-center my-5">

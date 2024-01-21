@@ -12,6 +12,8 @@
 		"build-production": "cross-env NODE_ENV=production vite build --config vite.config.ts"
 	},
 	"dependencies": {
+		"@daily-co/daily-js": "^0.56.0",
+		"@daily-co/daily-react": "^0.16.0",
 		"@fullcalendar/core": "^6.1.10",
 		"@fullcalendar/daygrid": "^6.1.10",
 		"@fullcalendar/react": "^6.1.10",
@@ -43,6 +45,7 @@
 		"react-select": "^5.7.0",
 		"react-spinners": "^0.13.8",
 		"react-toastify": "^9.1.1",
+		"recoil": "^0.7.7",
 		"styled-components": "^6.1.1"
 	},
 	"devDependencies": {
