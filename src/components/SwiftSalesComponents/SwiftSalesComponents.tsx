@@ -10,6 +10,7 @@ export const SwiftSalesButton = ({
 	onClick,
 	type = 'button',
 	disabled,
+	style
 }: {
 	size: string;
 	variant: string;
@@ -17,15 +18,19 @@ export const SwiftSalesButton = ({
 	onClick?: () => void;
 	type?: 'button' | 'submit' | 'reset' | undefined;
 	disabled?: boolean;
+	style?: React.CSSProperties;
 }) => {
 	return (
-		<BaseButton theme={{ size, variant, disabled }} onClick={onClick} type={type} disabled={disabled}>
+		<BaseButton theme={{ size, variant, disabled, style }} onClick={onClick} type={type} disabled={disabled}>
 			{children}
 		</BaseButton>
 	);
 };
 
 const BaseButton = styled.button`
+	// if style is provided, use it as important
+	${props => props.theme.style && props.theme.style}
+
 	font-size: ${props => (props.theme.size === 'small' ? '13px' : '16px')};
 	height: ${props => (props.theme.size === 'small' ? '28px' : '40px')};
 	width: ${props => (props.theme.size === 'small' ? '105px' : '120px')};

@@ -11,6 +11,7 @@ import Container from '../Container/Container';
 import React from 'react';
 import SwiftSalesButton from '../SwiftSalesComponents/SwiftSalesComponents';
 import { pdfjs } from 'react-pdf';
+import JSZip from 'jszip';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 
@@ -53,10 +54,58 @@ const FileBlock = ({
 				return <BsFileEarmark size={iconSize} fill="#102526" />;
 		}
 	};
+
+	const handleDownloadAllFiles = salesAppointmentFiles => {
+		const zip = new JSZip();
+
+		// Create a promise for each file fetch operation
+		const filePromises = salesAppointmentFiles.map(salesAppointmentFile => {
+			return fetch(salesAppointmentFile.file.filePath)
+				.then(response => {
+					if (!response.ok) {
+						throw new Error(`Failed to fetch ${salesAppointmentFile.file.filePath}`);
+					}
+					return response.blob(); // Get the file data as a Blob
+				})
+				.then(blob => {
+					zip.file(salesAppointmentFile.file.fileName, blob);
+				});
+		});
+
+		// Wait for all file fetch operations to complete
+		Promise.all(filePromises)
+			.then(() => {
+				zip.generateAsync({ type: 'blob' }).then(content => {
+					const url = window.URL.createObjectURL(content);
+					const link = document.createElement('a');
+					link.href = url;
+					link.download = 'files.zip';
+					link.click();
+				});
+			})
+			.catch(error => {
+				console.error('Error downloading files:', error);
+			});
+	};
+
 	return (
 		<Container className="overflow-auto">
 			<h3>Files</h3>
 			<div className="d-flex flex-column gap-2">
+				{salesAppointmentFiles.length > 1 && (
+					<SwiftSalesButton
+						style={{
+							width: '100% !important',
+						}}
+						size="large"
+						variant="primary"
+						onClick={() => {
+							handleDownloadAllFiles(salesAppointmentFiles);
+						}}
+					>
+						Download all files as a zip
+					</SwiftSalesButton>
+				)}
 				{salesAppointmentFiles.map(salesAppointmentFile => {
 					const file = salesAppointmentFile.file;
 					const fileType = file.fileName.split('.').pop();
