@@ -6,7 +6,6 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 const config: AxiosRequestConfig = {
 	baseURL: API_BASE_URL,
 	timeout: 60000,
-	withCredentials: true,
 };
 const axiosInstance: AxiosInstance = axios.create(config);
 

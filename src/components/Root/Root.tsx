@@ -1,7 +1,7 @@
 import api from '@src/api';
 import React, { useCallback, useEffect } from 'react';
 import MeetingBlock from '../MeetingBlock.tsx/MeetingBlock';
-import FileBlock from '../FileBlock/FileBlock';
+import FileBlock from '../ContentBlock/ContentBlock';
 import { ScaleLoader } from 'react-spinners';
 import Container from '../Container/Container';
 import styled from 'styled-components';
@@ -66,7 +66,8 @@ const Root = () => {
 	return (
 		<div className="w-100 h-100 justify-content-center d-flex gap-2 p-4">
 			<div
-				className="d-flex gap-2"
+				className="d-flex flex-column gap-2 h-100"
+				id="left-container"
 				style={{
 					width: previewFile ? '60%' : '100%',
 					transition: 'width 1s',
@@ -79,6 +80,7 @@ const Root = () => {
 						setPreviewFile={setPreviewFile}
 						previewFile={previewFile}
 						salesAppointmentFiles={salesAppointmentFiles}
+						salesAppointment={salesAppointment}
 					/>
 				)}
 			</div>

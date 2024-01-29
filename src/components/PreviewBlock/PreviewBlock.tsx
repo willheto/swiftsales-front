@@ -5,6 +5,8 @@ import { Document, Page } from 'react-pdf';
 import { pdfjs } from 'react-pdf';
 import { ScaleLoader } from 'react-spinners';
 import { IoClose } from 'react-icons/io5';
+import ExcelJS from 'exceljs/dist/exceljs.min.js';
+import { file } from 'jszip';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 
@@ -46,29 +48,59 @@ const PreviewBlock = ({
 		}, 1000);
 	}, []);
 
+	const getPreviewMaxHeight = () => {
+		const previewContainer = document.getElementById('left-container');
+		if (!previewContainer) return 0;
+		return previewContainer.clientHeight;
+	};
+
+	const previewFileIsExcel = previewFile.fileType === 'xls' || previewFile.fileType === 'xlsx';
+	const previewFileIsWordDocument = previewFile.fileType === 'doc' || previewFile.fileType === 'docx';
+
 	return (
-		<PreviewContainer>
+		<PreviewContainer theme={{ maxHeight: getPreviewMaxHeight() }}>
 			<Close onClick={() => setPreviewFile(null)}>
 				<IoClose size={30} />
 			</Close>
 			<Container className="overflow-auto w-100 h-100" id="preview-container">
 				{!renderPreview ? (
-					<div
-						className="d-flex justify-content-center align-items-center flex-column"
-						style={{
-							height: 'inherit',
-						}}
-					>
+					<div className="d-flex justify-content-center align-items-center flex-column h-100">
 						<ScaleLoader color="#102526" />
 						<span>Loading preview</span>
 					</div>
 				) : previewFile.fileType === 'pdf' ? (
-					<Document file={previewFile?.filePath} onLoadSuccess={onDocumentLoadSuccess}>
+					<Document
+						className={'h-100'}
+						file={previewFile?.filePath}
+						onLoadSuccess={onDocumentLoadSuccess}
+						loading={
+							<div className="d-flex justify-content-center align-items-center flex-column h-100">
+								<ScaleLoader color="#102526" />
+								<span>Loading preview</span>
+							</div>
+						}
+					>
 						<Page
 							width={getPreviewContainerWidth() > 0 ? getPreviewContainerWidth() : 300}
 							pageNumber={pageNumber}
 						/>
 					</Document>
+				) : previewFileIsExcel ? (
+					<div>
+						<iframe
+							src={`https://view.officeapps.live.com/op/embed.aspx?src=${previewFile.filePath}`}
+							width={getPreviewContainerWidth() > 0 ? getPreviewContainerWidth() : 300}
+							height={getPreviewMaxHeight()}
+						/>
+					</div>
+				) : previewFileIsWordDocument ? (
+					<div>
+						<iframe
+							src={`https://view.officeapps.live.com/op/embed.aspx?src=${previewFile.filePath}`}
+							width={getPreviewContainerWidth() > 0 ? getPreviewContainerWidth() : 300}
+							height={getPreviewMaxHeight()}
+						/>
+					</div>
 				) : (
 					<img src={previewFile?.filePath} alt="preview" style={{ width: '100%' }} />
 				)}
@@ -88,6 +120,7 @@ const Close = styled.div`
 `;
 
 const PreviewContainer = styled.div`
+	max-height: ${props => props.theme.maxHeight}px;
 	position: relative;
 	display: flex;
 	gap: 0.5rem;
