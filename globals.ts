@@ -4,6 +4,8 @@ const setupAPI = () => {
 			return 'http://192.168.33.10';
 		case 'development':
 			return 'https://dev-api.swiftsales.fi';
+		case 'production':
+			return 'https://api.swiftsales.fi';
 		default:
 			return 'http://192.168.33.10';
 	}
