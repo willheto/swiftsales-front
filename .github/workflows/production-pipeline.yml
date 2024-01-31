@@ -33,12 +33,12 @@ jobs:
 
             - name: Remove old build artifacts
               run: |
-                  sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'cd /var/www && rm -r dev-swiftsales-front && mkdir dev-swiftsales-front'
+                  sshpass -p 'EN7PAXVhV67jIGiPSLOB' ssh -o StrictHostKeyChecking=no root@146.190.25.3 'cd /var/www && rm -r swiftsales-front && mkdir swiftsales-front'
 
             # Transfer build artifacts to the VM using sshpass
             - name: Transfer Build Artifacts
               run: |
-                  sshpass -p 'TA4bgvMmMokqrKLOM1je' scp -o StrictHostKeyChecking=no -r dist/* root@146.190.56.16:/var/www/dev-swiftsales-front
+                  sshpass -p 'EN7PAXVhV67jIGiPSLOB' scp -o StrictHostKeyChecking=no -r dist/* root@146.190.25.3:/var/www/swiftsales-front
 
             - name: Get commit message
               id: commit_message
@@ -49,8 +49,6 @@ jobs:
               if: success()
               uses: appleboy/telegram-action@v0.1.0
               with:
-                to: -4099101573
-                token: 6949787786:AAHm2XxKc9lb-IPvgHcPI3uxJBZ2XE0SHGM
-                message: "Swiftsales development front päivitetty. \n\nTehdyt muutokset: ${{ steps.commit_message.outputs.message }}"
-
-            
+                  to: -4099101573
+                  token: 6949787786:AAHm2XxKc9lb-IPvgHcPI3uxJBZ2XE0SHGM
+                  message: "Swiftsales production front päivitetty. \n\nTehdyt muutokset: ${{ steps.commit_message.outputs.message }}"
