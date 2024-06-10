@@ -14,7 +14,7 @@ const MeetingBlock = ({ salesAppointment }: { salesAppointment: SalesAppointment
 		>
 			{salesAppointmentHasMeetingUrl ? (
 				<Meeting>
-					<StyledIframe src={salesAppointment?.meetingUrl} allow="camera; microphone" />
+					<StyledIframe src={salesAppointment?.meetingUrl} allow="camera; microphone; display-capture" />
 				</Meeting>
 			) : (
 				<div className="d-flex justify-content-center align-items-center my-5">
