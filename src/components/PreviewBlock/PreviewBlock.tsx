@@ -5,8 +5,8 @@ import { Document, Page } from 'react-pdf';
 import { pdfjs } from 'react-pdf';
 import { ScaleLoader } from 'react-spinners';
 import { IoClose } from 'react-icons/io5';
-import ExcelJS from 'exceljs/dist/exceljs.min.js';
-import { file } from 'jszip';
+import { Modal } from 'react-bootstrap';
+import { useMobileContext } from '../context/MobileContext';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 
@@ -32,7 +32,7 @@ const PreviewBlock = ({
 		setNumPages(numPages);
 	}
 
-	const getPreviewContainerWidth = () => {
+	const getPreviewContainerWidth = (): number => {
 		const previewContainer = document.getElementById('preview-container');
 		if (!previewContainer) return 0;
 		// return width - 3rem
@@ -40,15 +40,15 @@ const PreviewBlock = ({
 	};
 
 	// wait 1s before rendering to allow for the preview container to render
-	const [renderPreview, setRenderPreview] = useState(false);
+	const [renderPreview, setRenderPreview] = useState<boolean>(false);
 
-	React.useEffect(() => {
+	React.useEffect((): void => {
 		setTimeout(() => {
 			setRenderPreview(true);
 		}, 1000);
 	}, []);
 
-	const getPreviewMaxHeight = () => {
+	const getPreviewMaxHeight = (): number => {
 		const previewContainer = document.getElementById('left-container');
 		if (!previewContainer) return 0;
 		return previewContainer.clientHeight;
@@ -57,12 +57,67 @@ const PreviewBlock = ({
 	const previewFileIsExcel = previewFile.fileType === 'xls' || previewFile.fileType === 'xlsx';
 	const previewFileIsWordDocument = previewFile.fileType === 'doc' || previewFile.fileType === 'docx';
 
+	const { isMobile } = useMobileContext();
+
+	if (isMobile) {
+		return (
+			<Modal show={true} onHide={() => setPreviewFile(null)} size="lg">
+				<Modal.Header closeButton>
+					<Modal.Title>Preview</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					{!renderPreview ? (
+						<div className="d-flex justify-content-center align-items-center flex-column h-100">
+							<ScaleLoader color="#102526" />
+							<span>Loading preview</span>
+						</div>
+					) : previewFile.fileType === 'pdf' ? (
+						<Document
+							className={'h-100'}
+							file={previewFile?.filePath}
+							onLoadSuccess={onDocumentLoadSuccess}
+							loading={
+								<div className="d-flex justify-content-center align-items-center flex-column h-100">
+									<ScaleLoader color="#102526" />
+									<span>Loading preview</span>
+								</div>
+							}
+						>
+							<Page
+								width={getPreviewContainerWidth() > 0 ? getPreviewContainerWidth() : 300}
+								pageNumber={pageNumber}
+							/>
+						</Document>
+					) : previewFileIsExcel ? (
+						<div>
+							<iframe
+								src={`https://view.officeapps.live.com/op/embed.aspx?src=${previewFile.filePath}`}
+								width={getPreviewContainerWidth() > 0 ? getPreviewContainerWidth() : 300}
+								height={getPreviewMaxHeight()}
+							/>
+						</div>
+					) : previewFileIsWordDocument ? (
+						<div>
+							<iframe
+								src={`https://view.officeapps.live.com/op/embed.aspx?src=${previewFile.filePath}`}
+								width={getPreviewContainerWidth() > 0 ? getPreviewContainerWidth() : 300}
+								height={getPreviewMaxHeight()}
+							/>
+						</div>
+					) : (
+						<img src={previewFile?.filePath} alt="preview" style={{ width: '100%' }} />
+					)}
+				</Modal.Body>
+			</Modal>
+		);
+	}
+
 	return (
 		<PreviewContainer theme={{ maxHeight: getPreviewMaxHeight() }}>
 			<Close onClick={() => setPreviewFile(null)}>
 				<IoClose size={30} />
 			</Close>
-			<Container className="overflow-auto w-100 h-100" id="preview-container">
+			<Container className="overflow-auto w-100 h-100 p-4" id="preview-container">
 				{!renderPreview ? (
 					<div className="d-flex justify-content-center align-items-center flex-column h-100">
 						<ScaleLoader color="#102526" />
@@ -126,6 +181,9 @@ const PreviewContainer = styled.div`
 	gap: 0.5rem;
 	height: 100%;
 	overflow: auto;
+	margin-left: 1rem;
+	border: 1px solid #ccc;
+	border-radius: 5px;
 `;
 
 export default PreviewBlock;

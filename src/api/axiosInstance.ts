@@ -35,10 +35,11 @@ axiosInstance.interceptors.response.use(
 	},
 	error => {
 		if (error.response) {
-			// The request was made and the server responded with a status code
-			// that falls out of the range of 2xx
 			if (error.response.status === 401) {
-				if (error.response.data.error === 'Missing token' || error.response.data.error === 'Invalid token') {
+				if (
+					error.response.data.error === 'Missing token' ||
+					error.response.data.error === 'Invalid token'
+				) {
 					// Redirect to login page if the token is invalid
 					// Only if the requested endpoint is users/auth
 					if (error.response.config.url !== '/users/auth') {
@@ -51,16 +52,10 @@ axiosInstance.interceptors.response.use(
 			}
 			throw error.response;
 		} else if (error.request) {
-			// The request was made but no response was received
-			// `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-			// http.ClientRequest in node.js
 			let error = {
 				error: 'There seems to be a connection problem.',
 			};
 			throw error;
-			// throw error.request
-		} else {
-			// Something happened in setting up the request that triggered an Error
 		}
 		throw error;
 	},

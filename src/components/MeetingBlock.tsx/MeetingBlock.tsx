@@ -1,9 +1,9 @@
-import React from 'react';
 import Container from '../Container/Container';
 import styled from 'styled-components';
 
-const MeetingBlock = ({ salesAppointment }: { salesAppointment: SalesAppointmentInterface }) => {
+const MeetingBlock = ({ salesAppointment }: { salesAppointment: SalesAppointmentInterface }): JSX.Element => {
 	const salesAppointmentHasMeetingUrl = salesAppointment?.meetingUrl && salesAppointment?.meetingUrl.length > 0;
+
 	return (
 		<Container
 			className="w-100 position-relative"
@@ -32,11 +32,13 @@ const Meeting = styled.div`
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	border-radius: 5px;
 `;
 
 const StyledIframe = styled.iframe`
 	height: 100%;
 	aspect-ratio: 16/9;
+	border-radius: 5px;
 `;
 
 export default MeetingBlock;

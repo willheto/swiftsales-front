@@ -33,8 +33,8 @@ const ContentBlock = ({
 	} | null;
 	salesAppointmentFiles: SalesAppointmentFileInterface[];
 	salesAppointment: SalesAppointmentInterface;
-}) => {
-	const getIcon = (fileType: string) => {
+}): JSX.Element => {
+	const getIcon = (fileType: string): JSX.Element => {
 		const iconSize = 40;
 		switch (fileType) {
 			case 'pdf':
@@ -57,7 +57,7 @@ const ContentBlock = ({
 		}
 	};
 
-	const handleDownloadAllFiles = salesAppointmentFiles => {
+	const handleDownloadAllFiles = (salesAppointmentFiles: SalesAppointmentFileInterface[]): void => {
 		const zip = new JSZip();
 
 		// Create a promise for each file fetch operation
@@ -90,35 +90,38 @@ const ContentBlock = ({
 			});
 	};
 
-	const salesAppointmentHasNotes = salesAppointment.notes;
 	const [activeTab, setActiveTab] = React.useState<'notes' | 'files'>('notes');
 
 	return (
-		<Container className="overflow-auto">
+		<Container className="p-4 overflow-auto">
 			<div className="d-flex justify-content-between align-items-center mb-3">
 				<div className="d-flex align-items-center gap-2">
-					<h4
-						style={{
-							cursor: 'pointer',
-							color: activeTab === 'notes' ? '#102526' : '#ccc',
-						}}
-						onClick={() => {
-							setActiveTab('notes');
-						}}
-					>
-						Notes
-					</h4>
-					<h4
-						style={{
-							cursor: 'pointer',
-							color: activeTab === 'files' ? '#102526' : '#ccc',
-						}}
-						onClick={() => {
-							setActiveTab('files');
-						}}
-					>
-						Files
-					</h4>
+					{salesAppointment?.notes && (
+						<h4
+							style={{
+								cursor: 'pointer',
+								color: activeTab === 'notes' ? '#102526' : '#ccc',
+							}}
+							onClick={() => {
+								setActiveTab('notes');
+							}}
+						>
+							Notes
+						</h4>
+					)}
+					{salesAppointmentFiles.length > 0 && (
+						<h4
+							style={{
+								cursor: 'pointer',
+								color: activeTab === 'files' ? '#102526' : '#ccc',
+							}}
+							onClick={() => {
+								setActiveTab('files');
+							}}
+						>
+							Files
+						</h4>
+					)}
 				</div>
 				{activeTab === 'files' && salesAppointmentFiles.length > 1 && (
 					<SwiftSalesButton
@@ -135,7 +138,12 @@ const ContentBlock = ({
 			{activeTab === 'notes' && <div>{salesAppointment?.notes}</div>}
 
 			{activeTab === 'files' && (
-				<div className="d-flex flex-wrap gap-2 justify-content-around">
+				<div
+					className="d-grid gap-4 overflow-auto"
+					style={{
+						gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+					}}
+				>
 					{salesAppointmentFiles.map(salesAppointmentFile => {
 						const file = salesAppointmentFile.file;
 						const fileType = file.fileName.split('.').pop();
@@ -200,5 +208,4 @@ const FileContainer = styled.div`
 	border: 1px solid #ccc;
 	padding: 15px;
 	border-radius: 5px;
-	width: 48%;
 `;

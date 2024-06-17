@@ -1,18 +1,18 @@
 import api from '@src/api';
 import React, { useCallback, useEffect } from 'react';
 import MeetingBlock from '../MeetingBlock.tsx/MeetingBlock';
-import FileBlock from '../ContentBlock/ContentBlock';
 import { ScaleLoader } from 'react-spinners';
 import Container from '../Container/Container';
-import styled from 'styled-components';
 import PreviewBlock from '../PreviewBlock/PreviewBlock';
+import { useMobileContext } from '../context/MobileContext';
+import ContentBlock from '../ContentBlock/ContentBlock';
 
-const Root = () => {
+const Root = (): JSX.Element => {
 	const [error, setError] = React.useState<Error | null>(null);
 	const [salesAppointment, setSalesAppointment] = React.useState<SalesAppointmentInterface>();
 	const salesAppointmentFiles = salesAppointment?.salesAppointmentFiles || [];
 
-	const getSalesAppointment = useCallback(async () => {
+	const getSalesAppointment = useCallback(async (): Promise<void> => {
 		try {
 			const queryParams = new URLSearchParams(window.location.search);
 			const salesAppointmentID = queryParams.get('salesAppointmentID');
@@ -26,13 +26,13 @@ const Root = () => {
 			}
 			// @ts-ignore
 			setSalesAppointment(response.salesAppointment);
-		} catch (error) {
+		} catch (error: any) {
 			setError(error);
 			console.error(error);
 		}
 	}, []);
 
-	useEffect(() => {
+	useEffect((): void => {
 		getSalesAppointment();
 	}, [getSalesAppointment]);
 
@@ -41,7 +41,7 @@ const Root = () => {
 		filePath: string;
 	} | null>(null);
 
-	const salesAppointmentHasFiles = salesAppointmentFiles.length > 0;
+	const { isMobile } = useMobileContext();
 
 	if (!salesAppointment) {
 		return (
@@ -64,29 +64,30 @@ const Root = () => {
 	}
 
 	return (
-		<div className="w-100 h-100 justify-content-center d-flex gap-2 p-4">
+		<div className="w-100 h-100 justify-content-center d-flex p-2">
 			<div
 				className="d-flex flex-column gap-2 h-100"
 				id="left-container"
 				style={{
-					width: previewFile ? '60%' : '100%',
+					width: previewFile && !isMobile ? '60%' : '100%',
 					transition: 'width 1s',
 					maxWidth: '1400px',
 				}}
 			>
 				<MeetingBlock salesAppointment={salesAppointment} />
-				{salesAppointmentHasFiles && (
-					<FileBlock
+
+				{salesAppointmentFiles.length > 0 || salesAppointment.notes !== '' ? (
+					<ContentBlock
 						setPreviewFile={setPreviewFile}
 						previewFile={previewFile}
 						salesAppointmentFiles={salesAppointmentFiles}
 						salesAppointment={salesAppointment}
 					/>
-				)}
+				) : null}
 			</div>
 			<div
 				style={{
-					width: previewFile ? '40%' : '0%',
+					width: previewFile && !isMobile ? '40%' : '0%',
 					transition: 'width 1s',
 				}}
 			>
@@ -95,15 +96,5 @@ const Root = () => {
 		</div>
 	);
 };
-
-const FileContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 10px;
-	border: 1px solid #ccc;
-	padding: 15px;
-	border-radius: 5px;
-`;
 
 export default Root;
