@@ -3,12 +3,14 @@ import styled from 'styled-components';
 
 const MeetingBlock = ({ salesAppointment }: { salesAppointment: SalesAppointmentInterface }): JSX.Element => {
 	const salesAppointmentHasMeetingUrl = salesAppointment?.meetingUrl && salesAppointment?.meetingUrl.length > 0;
+	const salesAppointmentFiles = salesAppointment?.salesAppointmentFiles || [];
+	const noNotesOrFiles = salesAppointmentFiles.length === 0 && salesAppointment?.notes === '';
 
 	return (
 		<Container
 			className="w-100 position-relative"
 			style={{
-				maxHeight: '70%',
+				maxHeight: noNotesOrFiles ? '100%' : '70%',
 				height: '100%',
 			}}
 		>

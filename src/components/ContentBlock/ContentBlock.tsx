@@ -90,7 +90,8 @@ const ContentBlock = ({
 			});
 	};
 
-	const [activeTab, setActiveTab] = React.useState<'notes' | 'files'>('notes');
+	const hasNotes = salesAppointment?.notes && salesAppointment?.notes.length > 0;
+	const [activeTab, setActiveTab] = React.useState<'notes' | 'files'>(hasNotes ? 'notes' : 'files');
 
 	return (
 		<Container className="p-4 overflow-auto">

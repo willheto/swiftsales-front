@@ -8,7 +8,7 @@ import { useMobileContext } from '../context/MobileContext';
 import ContentBlock from '../ContentBlock/ContentBlock';
 
 const Root = (): JSX.Element => {
-	const [error, setError] = React.useState<Error | null>(null);
+	const [error, setError] = React.useState<string | null>(null);
 	const [salesAppointment, setSalesAppointment] = React.useState<SalesAppointmentInterface>();
 	const salesAppointmentFiles = salesAppointment?.salesAppointmentFiles || [];
 
@@ -27,7 +27,8 @@ const Root = (): JSX.Element => {
 			// @ts-ignore
 			setSalesAppointment(response.salesAppointment);
 		} catch (error: any) {
-			setError(error);
+			if (typeof error === 'string') setError(error);
+			if (typeof error.error === 'string') setError(error.error);
 			console.error(error);
 		}
 	}, []);
@@ -42,6 +43,7 @@ const Root = (): JSX.Element => {
 	} | null>(null);
 
 	const { isMobile } = useMobileContext();
+	console.log(error);
 
 	if (!salesAppointment) {
 		return (
@@ -50,7 +52,7 @@ const Root = (): JSX.Element => {
 					{error ? (
 						<>
 							<h2 className="mb-4">Something went wrong</h2>
-							<p className="mb-4 text-danger">{error.message}</p>
+							<p className="mb-4 text-danger">{error}</p>
 						</>
 					) : (
 						<>
